@@ -1,13 +1,28 @@
+const { verify } = require("./verifier")
+
+const Queue = require("./queue")
+var myQueue = new Queue();
+
 const fastify = require('fastify')({
     logger: true
   })
   
-  // Declare a route
-  fastify.get('/', function (request, reply) {
-    reply.send({ hello: 'world' })
+  fastify.get('/consume', function (request, reply) {
+    reply.send(myQueue.consume())
+  })
+
+  fastify.post('/publish', function (request, reply) {
+    
+    if(!verify(request.body)) return reply.send({ status: 'Not OK' })
+    
+    myQueue.publish(request.body)
+    return reply.send({status: "OK"})
+  })
+
+  fastify.delete('/remove', function (request, reply) {
+    reply.send(myQueue.remove())
   })
   
-  // Run the server!
   fastify.listen(process.env.PORT || 3000, function (err, address) {
     if (err) {
       fastify.log.error(err)
