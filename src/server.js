@@ -8,19 +8,21 @@ const fastify = require('fastify')({
   })
   
   fastify.get('/consume', function (request, reply) {
-    reply.send(myQueue.consume())
+    const event = myQueue.consume()
+    event == false ? reply.status(406).send({ message: "Empty queue" }) : reply.status(200).send(event)
   })
 
   fastify.post('/publish', function (request, reply) {
     
-    if(!verify(request.body)) return reply.send({ status: 'Not OK' })
+    if(!verify(request.body)) return reply.status(400).send({ message: "Incorrect body" })
     
     myQueue.publish(request.body)
-    return reply.send({status: "OK"})
+    return reply.status(200).send({message: "Event inserted in queue"})
   })
 
   fastify.delete('/remove', function (request, reply) {
-    reply.send(myQueue.remove())
+    const successfulDelete = myQueue.remove()
+    successfulDelete == false ? reply.status(406).send({ message: "Empty queue" }) : reply.status(200).send({ message: "Event successful removal" })
   })
   
   fastify.listen(process.env.PORT || 3000, function (err, address) {

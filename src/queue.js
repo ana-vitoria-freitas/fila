@@ -19,14 +19,15 @@ var Queue = function(){
     }
 
     this.consume = () =>{
-        if(self.isEmpty) return {"event": "empty"};
+        if(self.isEmpty()) return false;
         return self.queue[0];
     }
 
     this.remove = () =>{
-        if(self.isEmpty) return {"event": "empty"};
-        size--;
-        queue.shift();
+        if(self.isEmpty()) return false;
+        self.size--;
+        self.queue.shift();
+        return true;
     }
 
 }
